@@ -9,6 +9,7 @@ import { PriceChart } from './PriceChart';
 import { PredictionCard } from './PredictionCard';
 import { DataInputModule } from './DataInputModule';
 import { AIAssistant } from './AIAssistant';
+import { Footer } from './Footer';
 
 export const GoldPriceDashboard = () => {
   const [currentPrice, setCurrentPrice] = useState(2034.50);
@@ -49,15 +50,15 @@ export const GoldPriceDashboard = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-yellow-50 via-amber-50 to-orange-50 p-4">
-      <div className="max-w-7xl mx-auto space-y-6">
+    <div className="min-h-screen bg-gradient-to-br from-yellow-50 via-amber-50 to-orange-50">
+      <div className="max-w-7xl mx-auto p-4 space-y-6">
         
         {/* Header */}
         <div className="text-center space-y-4">
           <div className="flex items-center justify-center gap-2">
             <Sparkles className="h-8 w-8 text-yellow-600" />
             <h1 className="text-4xl font-bold bg-gradient-to-r from-yellow-600 to-amber-600 bg-clip-text text-transparent">
-              Gold Price Oracle
+              Gold Price Prediction Model
             </h1>
             <Sparkles className="h-8 w-8 text-yellow-600" />
           </div>
@@ -208,6 +209,9 @@ export const GoldPriceDashboard = () => {
           </div>
         )}
       </div>
+      
+      {/* Footer */}
+      <Footer />
     </div>
   );
 };
