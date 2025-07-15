@@ -7,27 +7,36 @@ interface PriceChartProps {
 }
 
 export const PriceChart = ({ simple = false }: PriceChartProps) => {
-  // Generate sample data
+  // Generate sample data for Nepal gold prices (NPR per tola)
   const generateData = () => {
     const data = [];
-    const basePrice = 2000;
+    const basePrice = 134000; // Base price in NPR per tola
     let currentPrice = basePrice;
     
     for (let i = 0; i < (simple ? 7 : 30); i++) {
-      const change = (Math.random() - 0.5) * 50;
+      const change = (Math.random() - 0.5) * 2000; // NPR variation
       currentPrice += change;
       data.push({
         date: simple 
           ? `Day ${i + 1}`
           : new Date(Date.now() - (30 - i) * 24 * 60 * 60 * 1000).toLocaleDateString(),
-        price: Math.max(1800, Math.min(2200, currentPrice)),
-        predicted: i >= (simple ? 5 : 25) ? Math.max(1800, Math.min(2200, currentPrice + (Math.random() - 0.5) * 30)) : null
+        price: Math.max(130000, Math.min(140000, currentPrice)),
+        predicted: i >= (simple ? 5 : 25) ? Math.max(130000, Math.min(140000, currentPrice + (Math.random() - 0.5) * 1500)) : null
       });
     }
     return data;
   };
 
   const data = generateData();
+
+  const formatNPR = (value: number) => {
+    return new Intl.NumberFormat('ne-NP', {
+      style: 'currency',
+      currency: 'NPR',
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 0,
+    }).format(value);
+  };
 
   if (simple) {
     return (
@@ -42,7 +51,7 @@ export const PriceChart = ({ simple = false }: PriceChartProps) => {
             </defs>
             <CartesianGrid strokeDasharray="3 3" stroke="#fde68a" />
             <XAxis dataKey="date" tick={{ fontSize: 12 }} />
-            <YAxis tick={{ fontSize: 12 }} />
+            <YAxis tick={{ fontSize: 12 }} tickFormatter={formatNPR} />
             <Tooltip 
               contentStyle={{ 
                 backgroundColor: 'rgba(251, 191, 36, 0.9)', 
@@ -50,6 +59,7 @@ export const PriceChart = ({ simple = false }: PriceChartProps) => {
                 borderRadius: '8px',
                 color: 'white'
               }}
+              formatter={(value: number) => [formatNPR(value), 'Price']}
             />
             <Area
               type="monotone"
@@ -70,7 +80,7 @@ export const PriceChart = ({ simple = false }: PriceChartProps) => {
         <LineChart data={data}>
           <CartesianGrid strokeDasharray="3 3" stroke="#fde68a" />
           <XAxis dataKey="date" tick={{ fontSize: 10 }} />
-          <YAxis tick={{ fontSize: 12 }} />
+          <YAxis tick={{ fontSize: 12 }} tickFormatter={formatNPR} />
           <Tooltip 
             contentStyle={{ 
               backgroundColor: 'rgba(0, 0, 0, 0.8)', 
@@ -78,6 +88,7 @@ export const PriceChart = ({ simple = false }: PriceChartProps) => {
               borderRadius: '8px',
               color: 'white'
             }}
+            formatter={(value: number, name: string) => [formatNPR(value), name]}
           />
           <Line 
             type="monotone" 

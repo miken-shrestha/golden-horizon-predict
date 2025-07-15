@@ -12,8 +12,8 @@ import { AIAssistant } from './AIAssistant';
 import { Footer } from './Footer';
 
 export const GoldPriceDashboard = () => {
-  const [currentPrice, setCurrentPrice] = useState(2034.50);
-  const [predictedPrice, setPredictedPrice] = useState(2045.20);
+  const [currentPrice, setCurrentPrice] = useState(134500); // NPR per tola
+  const [predictedPrice, setPredictedPrice] = useState(135800); // NPR per tola
   const [trend, setTrend] = useState<'up' | 'down'>('up');
   const [confidence, setConfidence] = useState<'high' | 'medium' | 'low'>('high');
   const [viewMode, setViewMode] = useState<'beginner' | 'analyst'>('beginner');
@@ -32,11 +32,21 @@ export const GoldPriceDashboard = () => {
   const trendIcon = trend === 'up' ? TrendingUp : TrendingDown;
   const trendColor = trend === 'up' ? 'text-green-600' : 'text-red-600';
 
+  // Format NPR currency
+  const formatNPR = (amount: number) => {
+    return new Intl.NumberFormat('ne-NP', {
+      style: 'currency',
+      currency: 'NPR',
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 0,
+    }).format(amount);
+  };
+
   useEffect(() => {
-    // Simulate real-time updates
+    // Simulate real-time updates for Nepal gold market
     const interval = setInterval(() => {
-      setCurrentPrice(prev => prev + (Math.random() - 0.5) * 5);
-      setPredictedPrice(prev => prev + (Math.random() - 0.5) * 8);
+      setCurrentPrice(prev => prev + (Math.random() - 0.5) * 500);
+      setPredictedPrice(prev => prev + (Math.random() - 0.5) * 800);
       setLastUpdate(new Date());
     }, 30000);
 
@@ -45,7 +55,6 @@ export const GoldPriceDashboard = () => {
 
   const handleFeedback = (type: 'positive' | 'negative') => {
     setFeedback(type);
-    // Here you would send feedback to your ML model
     console.log(`User feedback: ${type}`);
   };
 
@@ -58,11 +67,11 @@ export const GoldPriceDashboard = () => {
           <div className="flex items-center justify-center gap-2">
             <Sparkles className="h-8 w-8 text-yellow-600" />
             <h1 className="text-4xl font-bold bg-gradient-to-r from-yellow-600 to-amber-600 bg-clip-text text-transparent">
-              Gold Price Prediction Model
+              Nepal Gold Price Prediction Model
             </h1>
             <Sparkles className="h-8 w-8 text-yellow-600" />
           </div>
-          <p className="text-gray-600 text-lg">AI-Powered Gold Price Predictions & Market Analysis</p>
+          <p className="text-gray-600 text-lg">AI-Powered Gold Price Predictions for Nepal Market</p>
           
           {/* View Toggle */}
           <div className="flex justify-center">
@@ -95,13 +104,13 @@ export const GoldPriceDashboard = () => {
             <CardHeader className="pb-2">
               <CardTitle className="flex items-center gap-2 text-xl">
                 <Star className="h-6 w-6" />
-                Current Gold Price
+                Current Gold Price (Nepal)
               </CardTitle>
             </CardHeader>
             <CardContent>
               <div className="space-y-2">
-                <div className="text-3xl font-bold">${currentPrice.toFixed(2)}</div>
-                <div className="text-sm opacity-90">per ounce (Troy)</div>
+                <div className="text-3xl font-bold">{formatNPR(currentPrice)}</div>
+                <div className="text-sm opacity-90">per tola (11.66 grams)</div>
                 <div className="text-xs opacity-75">
                   Last updated: {lastUpdate.toLocaleTimeString()}
                 </div>
@@ -119,6 +128,7 @@ export const GoldPriceDashboard = () => {
             confidenceEmoji={confidenceEmoji[confidence]}
             trendIcon={trendIcon}
             trendColor={trendColor}
+            formatCurrency={formatNPR}
           />
 
           {/* Quick Stats */}
@@ -126,13 +136,13 @@ export const GoldPriceDashboard = () => {
             <CardHeader className="pb-2">
               <CardTitle className="flex items-center gap-2">
                 <Brain className="h-5 w-5 text-purple-600" />
-                ML Insights
+                ML Insights (Nepal Market)
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-3">
               <div className="flex justify-between">
                 <span className="text-sm text-gray-600">Accuracy Rate</span>
-                <Badge variant="secondary" className="bg-green-100 text-green-800">84.7%</Badge>
+                <Badge variant="secondary" className="bg-green-100 text-green-800">82.3%</Badge>
               </div>
               <div className="flex justify-between">
                 <span className="text-sm text-gray-600">Model Type</span>
@@ -140,7 +150,7 @@ export const GoldPriceDashboard = () => {
               </div>
               <div className="flex justify-between">
                 <span className="text-sm text-gray-600">Data Points</span>
-                <span className="text-sm font-medium">2,847</span>
+                <span className="text-sm font-medium">1,247</span>
               </div>
               <div className="flex justify-between">
                 <span className="text-sm text-gray-600">Next Update</span>
@@ -198,7 +208,7 @@ export const GoldPriceDashboard = () => {
           <div className="space-y-6">
             <Card className="shadow-lg">
               <CardHeader>
-                <CardTitle>📊 Advanced Price Analysis</CardTitle>
+                <CardTitle>📊 Advanced Price Analysis (Nepal)</CardTitle>
               </CardHeader>
               <CardContent>
                 <PriceChart simple={false} />

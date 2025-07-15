@@ -13,6 +13,7 @@ interface PredictionCardProps {
   confidenceEmoji: string;
   trendIcon: LucideIcon;
   trendColor: string;
+  formatCurrency?: (amount: number) => string;
 }
 
 export const PredictionCard = ({
@@ -23,7 +24,8 @@ export const PredictionCard = ({
   confidence,
   confidenceEmoji,
   trendIcon: TrendIcon,
-  trendColor
+  trendColor,
+  formatCurrency = (amount) => `$${amount.toFixed(2)}`
 }: PredictionCardProps) => {
   return (
     <Card className="shadow-lg border-2 border-amber-200 bg-gradient-to-br from-amber-50 to-yellow-50">
@@ -35,11 +37,11 @@ export const PredictionCard = ({
       </CardHeader>
       <CardContent className="space-y-3">
         <div className="text-2xl font-bold text-gray-800">
-          ${predictedPrice.toFixed(2)}
+          {formatCurrency(predictedPrice)}
         </div>
         <div className={`flex items-center gap-2 ${trendColor}`}>
           <span className="font-medium">
-            {priceChange > 0 ? '+' : ''}${priceChange.toFixed(2)}
+            {priceChange > 0 ? '+' : ''}{formatCurrency(priceChange)}
           </span>
           <span className="text-sm">
             ({priceChange > 0 ? '+' : ''}{changePercent}%)
@@ -55,7 +57,7 @@ export const PredictionCard = ({
           </Badge>
         </div>
         <div className="text-xs text-gray-500">
-          Based on ML analysis of market trends
+          Based on Nepal market analysis
         </div>
       </CardContent>
     </Card>

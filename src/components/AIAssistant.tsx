@@ -15,11 +15,12 @@ export const AIAssistant = ({ currentPrice, predictedPrice, trend, confidence }:
   const [isTyping, setIsTyping] = useState(false);
 
   const messages = [
-    `Hi Miken! 🌟 Based on current market trends, gold might shine ${trend === 'up' ? 'brighter' : 'a bit dimmer'} tomorrow ✨`,
-    `Good ${new Date().getHours() < 12 ? 'morning' : new Date().getHours() < 18 ? 'afternoon' : 'evening'}! The golden crystal ball shows ${trend === 'up' ? 'promising' : 'cautious'} signals ahead 🔮`,
-    `Market whispers suggest gold prices are ${trend === 'up' ? 'dancing upward' : 'taking a breather'}. Confidence level: ${confidence} ${confidence === 'high' ? '😊' : confidence === 'medium' ? '😐' : '😟'}`,
-    `✨ Goldeen here! The precious metal markets are showing ${trend === 'up' ? 'bullish' : 'bearish'} patterns. Stay tuned for more insights! 📈`,
-    `🎯 My ML sensors detect a ${Math.abs(predictedPrice - currentPrice).toFixed(2)} point ${trend === 'up' ? 'upward' : 'downward'} movement brewing!`
+    `Namaste Miken! 🙏 Based on Nepal's market trends, gold might ${trend === 'up' ? 'shine brighter' : 'take a pause'} tomorrow ✨`,
+    `Good ${new Date().getHours() < 12 ? 'morning' : new Date().getHours() < 18 ? 'afternoon' : 'evening'}! The Nepal gold market shows ${trend === 'up' ? 'promising' : 'cautious'} signals ahead 🔮`,
+    `Market whispers from Kathmandu suggest gold prices are ${trend === 'up' ? 'dancing upward' : 'taking a breather'}. Confidence: ${confidence} ${confidence === 'high' ? '😊' : confidence === 'medium' ? '😐' : '😟'}`,
+    `✨ Goldeen here! Nepal's precious metal markets are showing ${trend === 'up' ? 'bullish' : 'bearish'} patterns influenced by remittance flows! 📈`,
+    `🎯 My ML sensors detect a ${Math.abs(predictedPrice - currentPrice).toFixed(0)} NPR ${trend === 'up' ? 'upward' : 'downward'} movement brewing in Nepal's market!`,
+    `🏔️ From the Himalayas to your portfolio - Nepal's gold market is ${trend === 'up' ? 'climbing higher' : 'finding support levels'}!`
   ];
 
   useEffect(() => {
@@ -50,7 +51,7 @@ export const AIAssistant = ({ currentPrice, predictedPrice, trend, confidence }:
           
           <div className="flex-1 space-y-2">
             <div className="flex items-center gap-2">
-              <h3 className="font-bold text-purple-800">Goldeen AI Assistant</h3>
+              <h3 className="font-bold text-purple-800">Goldeen AI Assistant (Nepal)</h3>
               <MessageCircle className="h-4 w-4 text-purple-600" />
             </div>
             
@@ -62,7 +63,7 @@ export const AIAssistant = ({ currentPrice, predictedPrice, trend, confidence }:
                     <div className="w-2 h-2 bg-purple-400 rounded-full animate-bounce" style={{animationDelay: '0.1s'}}></div>
                     <div className="w-2 h-2 bg-purple-400 rounded-full animate-bounce" style={{animationDelay: '0.2s'}}></div>
                   </div>
-                  <span className="text-sm">Goldeen is thinking...</span>
+                  <span className="text-sm">Goldeen is analyzing Nepal market...</span>
                 </div>
               ) : (
                 <p className="text-gray-800 leading-relaxed">{message}</p>
