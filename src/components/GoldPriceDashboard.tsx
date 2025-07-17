@@ -4,16 +4,22 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { TrendingUp, TrendingDown, Sparkles, Brain, ThumbsUp, ThumbsDown, Star } from 'lucide-react';
+import { TrendingUp, TrendingDown, Sparkles, Brain, ThumbsUp, ThumbsDown, Star, LogOut, Shield } from 'lucide-react';
 import { PriceChart } from './PriceChart';
 import { PredictionCard } from './PredictionCard';
 import { DataInputModule } from './DataInputModule';
 import { AIAssistant } from './AIAssistant';
 import { Footer } from './Footer';
+import { AdminDashboard } from './AdminDashboard';
+import { useAuth } from '@/contexts/AuthContext';
+import { activityService } from '@/services/activityService';
+import { useToast } from '@/hooks/use-toast';
 
 export const GoldPriceDashboard = () => {
-  const [currentPrice, setCurrentPrice] = useState(134500); // NPR per tola
-  const [predictedPrice, setPredictedPrice] = useState(135800); // NPR per tola
+  const { user, logout } = useAuth();
+  const { toast } = useToast();
+  const [currentPrice, setCurrentPrice] = useState(134500);
+  const [predictedPrice, setPredictedPrice] = useState(135800);
   const [trend, setTrend] = useState<'up' | 'down'>('up');
   const [confidence, setConfidence] = useState<'high' | 'medium' | 'low'>('high');
   const [viewMode, setViewMode] = useState<'beginner' | 'analyst'>('beginner');
@@ -32,7 +38,6 @@ export const GoldPriceDashboard = () => {
   const trendIcon = trend === 'up' ? TrendingUp : TrendingDown;
   const trendColor = trend === 'up' ? 'text-green-600' : 'text-red-600';
 
-  // Format NPR currency
   const formatNPR = (amount: number) => {
     return new Intl.NumberFormat('ne-NP', {
       style: 'currency',
@@ -43,23 +48,120 @@ export const GoldPriceDashboard = () => {
   };
 
   useEffect(() => {
-    // Simulate real-time updates for Nepal gold market
+    if (user) {
+      // Log user login activity
+      activityService.logActivity(
+        user.id,
+        user.email,
+        user.name,
+        'User Login',
+        `${user.role === 'admin' ? 'Admin' : 'User'} logged into the system`
+      );
+    }
+  }, [user]);
+
+  useEffect(() => {
     const interval = setInterval(() => {
+      const oldPrice = currentPrice;
+      const oldPredicted = predictedPrice;
+      
       setCurrentPrice(prev => prev + (Math.random() - 0.5) * 500);
       setPredictedPrice(prev => prev + (Math.random() - 0.5) * 800);
       setLastUpdate(new Date());
+
+      if (user) {
+        activityService.logActivity(
+          user.id,
+          user.email,
+          user.name,
+          'Price Update',
+          'Viewed updated gold price prediction',
+          {
+            currentPrice: oldPrice,
+            predictedPrice: oldPredicted,
+            trend
+          }
+        );
+      }
     }, 30000);
 
     return () => clearInterval(interval);
-  }, []);
+  }, [user, currentPrice, predictedPrice, trend]);
 
   const handleFeedback = (type: 'positive' | 'negative') => {
     setFeedback(type);
-    console.log(`User feedback: ${type}`);
+    
+    if (user) {
+      activityService.addReview(
+        user.id,
+        user.email,
+        user.name,
+        type,
+        type === 'positive' ? 'Found the prediction helpful' : 'Prediction was not helpful'
+      );
+      
+      activityService.logActivity(
+        user.id,
+        user.email,
+        user.name,
+        'Feedback Submitted',
+        `User provided ${type} feedback on prediction`
+      );
+    }
+
+    toast({
+      title: "Feedback Received",
+      description: `Thank you for your ${type} feedback! 🙏`,
+    });
   };
+
+  const handleLogout = () => {
+    if (user) {
+      activityService.logActivity(
+        user.id,
+        user.email,
+        user.name,
+        'User Logout',
+        `${user.role === 'admin' ? 'Admin' : 'User'} logged out of the system`
+      );
+    }
+    logout();
+  };
+
+  // Show admin dashboard for admin users
+  if (user?.role === 'admin') {
+    return (
+      <div>
+        <div className="fixed top-4 right-4 z-50 flex items-center gap-2">
+          <Badge className="bg-red-500 text-white">
+            <Shield className="h-3 w-3 mr-1" />
+            Admin Mode
+          </Badge>
+          <Button onClick={handleLogout} variant="outline" size="sm">
+            <LogOut className="h-4 w-4 mr-2" />
+            Logout
+          </Button>
+        </div>
+        <AdminDashboard />
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-yellow-50 via-amber-50 to-orange-50">
+      {/* User Header */}
+      {user && (
+        <div className="fixed top-4 right-4 z-50 flex items-center gap-2">
+          <Badge variant="outline">
+            Welcome, {user.name}
+          </Badge>
+          <Button onClick={handleLogout} variant="outline" size="sm">
+            <LogOut className="h-4 w-4 mr-2" />
+            Logout
+          </Button>
+        </div>
+      )}
+
       <div className="max-w-7xl mx-auto p-4 space-y-6">
         
         {/* Header */}
@@ -73,7 +175,6 @@ export const GoldPriceDashboard = () => {
           </div>
           <p className="text-gray-600 text-lg">AI-Powered Gold Price Predictions for Nepal Market</p>
           
-          {/* View Toggle */}
           <div className="flex justify-center">
             <Tabs value={viewMode} onValueChange={(value) => setViewMode(value as 'beginner' | 'analyst')}>
               <TabsList className="bg-yellow-100 border-yellow-200">
@@ -88,7 +189,6 @@ export const GoldPriceDashboard = () => {
           </div>
         </div>
 
-        {/* AI Assistant */}
         <AIAssistant 
           currentPrice={currentPrice}
           predictedPrice={predictedPrice}
@@ -96,10 +196,8 @@ export const GoldPriceDashboard = () => {
           confidence={confidence}
         />
 
-        {/* Main Dashboard */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           
-          {/* Current Price Card */}
           <Card className="bg-gradient-to-br from-yellow-400 to-amber-500 text-white shadow-xl">
             <CardHeader className="pb-2">
               <CardTitle className="flex items-center gap-2 text-xl">
@@ -118,7 +216,6 @@ export const GoldPriceDashboard = () => {
             </CardContent>
           </Card>
 
-          {/* Prediction Card */}
           <PredictionCard 
             predictedPrice={predictedPrice}
             priceChange={priceChange}
@@ -131,7 +228,6 @@ export const GoldPriceDashboard = () => {
             formatCurrency={formatNPR}
           />
 
-          {/* Quick Stats */}
           <Card className="shadow-lg border-yellow-200">
             <CardHeader className="pb-2">
               <CardTitle className="flex items-center gap-2">
@@ -160,7 +256,6 @@ export const GoldPriceDashboard = () => {
           </Card>
         </div>
 
-        {/* Conditional Content Based on View Mode */}
         {viewMode === 'beginner' ? (
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             <Card className="shadow-lg">
@@ -220,7 +315,6 @@ export const GoldPriceDashboard = () => {
         )}
       </div>
       
-      {/* Footer */}
       <Footer />
     </div>
   );

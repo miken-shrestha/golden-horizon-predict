@@ -1,5 +1,6 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -7,35 +8,47 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Eye, EyeOff, Mail, Lock, User, TrendingUp, Shield, Sparkles } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import { useAuth } from '@/contexts/AuthContext';
 
 const Login = () => {
+  const navigate = useNavigate();
+  const { user, login, register, isLoading } = useAuth();
   const [showPassword, setShowPassword] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
   const [loginData, setLoginData] = useState({ email: '', password: '' });
   const [registerData, setRegisterData] = useState({ name: '', email: '', password: '', confirmPassword: '' });
   const { toast } = useToast();
 
+  useEffect(() => {
+    if (user) {
+      navigate('/');
+    }
+  }, [user, navigate]);
+
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    setIsLoading(true);
     
-    // Simulate login process
-    setTimeout(() => {
-      if (loginData.email === 'mikenxtha@gmail.com' && loginData.password === 'miken123') {
+    const success = await login(loginData.email, loginData.password);
+    
+    if (success) {
+      if (loginData.email === 'mikenxtha@gmail.com') {
         toast({
           title: "Welcome Admin!",
           description: "You have successfully logged in as administrator.",
         });
-        // Redirect to admin dashboard
       } else {
         toast({
           title: "Login Successful!",
           description: "Welcome to Nepal Gold Price Prediction.",
         });
-        // Redirect to user dashboard
       }
-      setIsLoading(false);
-    }, 2000);
+      navigate('/');
+    } else {
+      toast({
+        title: "Login Failed",
+        description: "Invalid email or password. Try 'demo123' for regular users.",
+        variant: "destructive",
+      });
+    }
   };
 
   const handleRegister = async (e: React.FormEvent) => {
@@ -49,14 +62,15 @@ const Login = () => {
       return;
     }
     
-    setIsLoading(true);
-    setTimeout(() => {
+    const success = await register(registerData.name, registerData.email, registerData.password);
+    
+    if (success) {
       toast({
         title: "Account Created!",
         description: "Your account has been successfully created.",
       });
-      setIsLoading(false);
-    }, 2000);
+      navigate('/');
+    }
   };
 
   return (
@@ -68,7 +82,6 @@ const Login = () => {
         <div className="absolute bottom-1/4 left-1/3 w-64 h-64 bg-amber-200 rounded-full mix-blend-multiply filter blur-xl opacity-30 animate-pulse delay-2000"></div>
       </div>
 
-      {/* Floating Gold Coins Animation */}
       <div className="absolute inset-0 pointer-events-none">
         {[...Array(6)].map((_, i) => (
           <div
@@ -178,6 +191,11 @@ const Login = () => {
                     )}
                   </Button>
                 </form>
+                <div className="mt-4 text-center">
+                  <p className="text-xs text-gray-500">
+                    Demo credentials: Any email with password "demo123"
+                  </p>
+                </div>
               </TabsContent>
               
               <TabsContent value="register" className="animate-fade-in">
