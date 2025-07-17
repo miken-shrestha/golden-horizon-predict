@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
@@ -45,7 +44,7 @@ const Login = () => {
     } else {
       toast({
         title: "Login Failed",
-        description: "Invalid email or password. Try 'demo123' for regular users.",
+        description: "Invalid email or password. Please check your credentials.",
         variant: "destructive",
       });
     }
@@ -191,11 +190,6 @@ const Login = () => {
                     )}
                   </Button>
                 </form>
-                <div className="mt-4 text-center">
-                  <p className="text-xs text-gray-500">
-                    Demo credentials: Any email with password "demo123"
-                  </p>
-                </div>
               </TabsContent>
               
               <TabsContent value="register" className="animate-fade-in">

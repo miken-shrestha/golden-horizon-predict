@@ -58,20 +58,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       return true;
     }
     
-    // Check for regular users (demo users)
-    if (password === 'demo123') {
-      const regularUser: User = {
-        id: `user-${Date.now()}`,
-        email,
-        name: email.split('@')[0],
-        role: 'user'
-      };
-      setUser(regularUser);
-      localStorage.setItem('user', JSON.stringify(regularUser));
-      setIsLoading(false);
-      return true;
-    }
-    
     setIsLoading(false);
     return false;
   };
