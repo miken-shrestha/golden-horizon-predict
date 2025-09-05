@@ -7,37 +7,37 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Users, Activity, MessageSquare, Settings, TrendingUp, ThumbsUp, ThumbsDown } from 'lucide-react';
-import { activityService, Activity as ActivityType, Review } from '@/services/activityService';
+import { activityService, Activity as ActivityType, Review } from '@/services/activity';
 import { useToast } from '@/hooks/use-toast';
 
-export const AdminDashboard = () => {
+export const Admin = () => {
   const [activities, setActivities] = useState<ActivityType[]>([]);
-  const [reviews, setReviews] = useState<Review[]>([]);
-  const [modelParams, setModelParams] = useState({
-    learningRate: 0.01,
+  const [reviewsList, setReviewsList] = useState<Review[]>([]);
+  const [params, setParams] = useState({
+    rate: 0.01,
     epochs: 100,
-    batchSize: 32,
-    validationSplit: 0.2
+    batch: 32,
+    split: 0.2
   });
   const { toast } = useToast();
 
   useEffect(() => {
     setActivities(activityService.getActivities());
-    setReviews(activityService.getReviews());
+    setReviewsList(activityService.getReviews());
   }, []);
 
-  const activityStats = activityService.getActivityStats();
+  const stats = activityService.getActivityStats();
   const reviewStats = activityService.getReviewStats();
 
-  const handleUpdateModelParams = () => {
-    localStorage.setItem('modelParams', JSON.stringify(modelParams));
+  const updateParams = () => {
+    localStorage.setItem('modelParams', JSON.stringify(params));
     toast({
       title: "Model Parameters Updated",
       description: "The ML model parameters have been successfully updated.",
     });
   };
 
-  const formatTimestamp = (date: Date) => {
+  const formatTime = (date: Date) => {
     return new Intl.DateTimeFormat('en-US', {
       month: 'short',
       day: 'numeric',
@@ -65,7 +65,7 @@ export const AdminDashboard = () => {
                 <Users className="h-8 w-8" />
                 <div>
                   <p className="text-sm opacity-90">Unique Users</p>
-                  <p className="text-2xl font-bold">{activityStats.uniqueUsers}</p>
+                  <p className="text-2xl font-bold">{stats.uniqueUsers}</p>
                 </div>
               </div>
             </CardContent>
@@ -77,7 +77,7 @@ export const AdminDashboard = () => {
                 <Activity className="h-8 w-8" />
                 <div>
                   <p className="text-sm opacity-90">Total Activities</p>
-                  <p className="text-2xl font-bold">{activityStats.total}</p>
+                  <p className="text-2xl font-bold">{stats.total}</p>
                 </div>
               </div>
             </CardContent>
@@ -143,7 +143,7 @@ export const AdminDashboard = () => {
                             </div>
                           )}
                         </div>
-                        <span className="text-xs text-gray-400">{formatTimestamp(activity.timestamp)}</span>
+                        <span className="text-xs text-gray-400">{formatTime(activity.timestamp)}</span>
                       </div>
                     ))
                   )}
@@ -162,10 +162,10 @@ export const AdminDashboard = () => {
               </CardHeader>
               <CardContent>
                 <div className="space-y-3 max-h-96 overflow-y-auto">
-                  {reviews.length === 0 ? (
+                  {reviewsList.length === 0 ? (
                     <p className="text-gray-500 text-center py-8">No reviews submitted yet</p>
                   ) : (
-                    reviews.map((review) => (
+                    reviewsList.map((review) => (
                       <div key={review.id} className="flex items-start justify-between p-3 bg-gray-50 rounded-lg">
                         <div className="flex-1">
                           <div className="flex items-center gap-2">
@@ -181,7 +181,7 @@ export const AdminDashboard = () => {
                             <p className="text-sm text-gray-600 mt-1">"{review.comment}"</p>
                           )}
                         </div>
-                        <span className="text-xs text-gray-400">{formatTimestamp(review.timestamp)}</span>
+                        <span className="text-xs text-gray-400">{formatTime(review.timestamp)}</span>
                       </div>
                     ))
                   )}
@@ -206,8 +206,8 @@ export const AdminDashboard = () => {
                       id="learningRate"
                       type="number"
                       step="0.001"
-                      value={modelParams.learningRate}
-                      onChange={(e) => setModelParams({...modelParams, learningRate: parseFloat(e.target.value)})}
+                      value={params.rate}
+                      onChange={(e) => setParams({...params, rate: parseFloat(e.target.value)})}
                     />
                   </div>
                   <div className="space-y-2">
@@ -215,8 +215,8 @@ export const AdminDashboard = () => {
                     <Input
                       id="epochs"
                       type="number"
-                      value={modelParams.epochs}
-                      onChange={(e) => setModelParams({...modelParams, epochs: parseInt(e.target.value)})}
+                      value={params.epochs}
+                      onChange={(e) => setParams({...params, epochs: parseInt(e.target.value)})}
                     />
                   </div>
                   <div className="space-y-2">
@@ -224,8 +224,8 @@ export const AdminDashboard = () => {
                     <Input
                       id="batchSize"
                       type="number"
-                      value={modelParams.batchSize}
-                      onChange={(e) => setModelParams({...modelParams, batchSize: parseInt(e.target.value)})}
+                      value={params.batch}
+                      onChange={(e) => setParams({...params, batch: parseInt(e.target.value)})}
                     />
                   </div>
                   <div className="space-y-2">
@@ -234,12 +234,12 @@ export const AdminDashboard = () => {
                       id="validationSplit"
                       type="number"
                       step="0.1"
-                      value={modelParams.validationSplit}
-                      onChange={(e) => setModelParams({...modelParams, validationSplit: parseFloat(e.target.value)})}
+                      value={params.split}
+                      onChange={(e) => setParams({...params, split: parseFloat(e.target.value)})}
                     />
                   </div>
                 </div>
-                <Button onClick={handleUpdateModelParams} className="w-full">
+                <Button onClick={updateParams} className="w-full">
                   Update Model Parameters
                 </Button>
               </CardContent>

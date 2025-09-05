@@ -2,11 +2,11 @@
 import React from 'react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Area, AreaChart } from 'recharts';
 
-interface PriceChartProps {
+interface ChartProps {
   simple?: boolean;
 }
 
-export const PriceChart = ({ simple = false }: PriceChartProps) => {
+export const Chart = ({ simple = false }: ChartProps) => {
   // Generate sample data for Nepal gold prices (NPR per tola)
   const generateData = () => {
     const data = [];
@@ -29,7 +29,7 @@ export const PriceChart = ({ simple = false }: PriceChartProps) => {
 
   const data = generateData();
 
-  const formatNPR = (value: number) => {
+  const format = (value: number) => {
     return new Intl.NumberFormat('ne-NP', {
       style: 'currency',
       currency: 'NPR',
@@ -51,7 +51,7 @@ export const PriceChart = ({ simple = false }: PriceChartProps) => {
             </defs>
             <CartesianGrid strokeDasharray="3 3" stroke="#fde68a" />
             <XAxis dataKey="date" tick={{ fontSize: 12 }} />
-            <YAxis tick={{ fontSize: 12 }} tickFormatter={formatNPR} />
+            <YAxis tick={{ fontSize: 12 }} tickFormatter={format} />
             <Tooltip 
               contentStyle={{ 
                 backgroundColor: 'rgba(251, 191, 36, 0.9)', 
@@ -59,7 +59,7 @@ export const PriceChart = ({ simple = false }: PriceChartProps) => {
                 borderRadius: '8px',
                 color: 'white'
               }}
-              formatter={(value: number) => [formatNPR(value), 'Price']}
+              formatter={(value: number) => [format(value), 'Price']}
             />
             <Area
               type="monotone"
@@ -80,7 +80,7 @@ export const PriceChart = ({ simple = false }: PriceChartProps) => {
         <LineChart data={data}>
           <CartesianGrid strokeDasharray="3 3" stroke="#fde68a" />
           <XAxis dataKey="date" tick={{ fontSize: 10 }} />
-          <YAxis tick={{ fontSize: 12 }} tickFormatter={formatNPR} />
+          <YAxis tick={{ fontSize: 12 }} tickFormatter={format} />
           <Tooltip 
             contentStyle={{ 
               backgroundColor: 'rgba(0, 0, 0, 0.8)', 
@@ -88,7 +88,7 @@ export const PriceChart = ({ simple = false }: PriceChartProps) => {
               borderRadius: '8px',
               color: 'white'
             }}
-            formatter={(value: number, name: string) => [formatNPR(value), name]}
+            formatter={(value: number, name: string) => [format(value), name]}
           />
           <Line 
             type="monotone" 

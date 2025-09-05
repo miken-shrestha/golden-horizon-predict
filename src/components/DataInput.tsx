@@ -8,19 +8,19 @@ import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { RefreshCw, Download, Upload, TrendingUp } from 'lucide-react';
 
-export const DataInputModule = () => {
-  const [isLoading, setIsLoading] = useState(false);
-  const [lastSync, setLastSync] = useState(new Date());
+export const DataInput = () => {
+  const [loading, setLoading] = useState(false);
+  const [sync, setSync] = useState(new Date());
 
-  const handleRefreshData = async () => {
-    setIsLoading(true);
+  const refresh = async () => {
+    setLoading(true);
     // Simulate API call
     await new Promise(resolve => setTimeout(resolve, 2000));
-    setLastSync(new Date());
-    setIsLoading(false);
+    setSync(new Date());
+    setLoading(false);
   };
 
-  const marketData = [
+  const data = [
     { label: 'USD/NPR Rate', value: '132.45', change: '+0.15%', status: 'updated' },
     { label: 'INR/NPR Rate', value: '1.59', change: '-0.08%', status: 'updated' },
     { label: 'Nepal Stock Index (NEPSE)', value: '2,089.35', change: '+1.23%', status: 'updated' },
@@ -41,15 +41,15 @@ export const DataInputModule = () => {
           </span>
           <div className="flex items-center gap-2">
             <Badge variant="outline" className="text-xs">
-              Last sync: {lastSync.toLocaleTimeString()}
+              Last sync: {sync.toLocaleTimeString()}
             </Badge>
             <Button 
               size="sm" 
-              onClick={handleRefreshData}
-              disabled={isLoading}
+              onClick={refresh}
+              disabled={loading}
               className="bg-blue-600 hover:bg-blue-700"
             >
-              <RefreshCw className={`h-4 w-4 mr-1 ${isLoading ? 'animate-spin' : ''}`} />
+              <RefreshCw className={`h-4 w-4 mr-1 ${loading ? 'animate-spin' : ''}`} />
               Refresh
             </Button>
           </div>
@@ -64,7 +64,7 @@ export const DataInputModule = () => {
           
           <TabsContent value="automatic" className="space-y-4">
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {marketData.map((item, index) => (
+              {data.map((item, index) => (
                 <div key={index} className="p-4 border rounded-lg bg-gray-50">
                   <div className="flex items-center justify-between mb-2">
                     <span className="text-sm font-medium text-gray-700">{item.label}</span>

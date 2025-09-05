@@ -3,14 +3,14 @@ import React, { useState, useEffect } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Sparkles, MessageCircle } from 'lucide-react';
 
-interface AIAssistantProps {
+interface AssistantProps {
   currentPrice: number;
   predictedPrice: number;
   trend: 'up' | 'down';
   confidence: 'high' | 'medium' | 'low';
 }
 
-export const AIAssistant = ({ currentPrice, predictedPrice, trend, confidence }: AIAssistantProps) => {
+export const Assistant = ({ currentPrice, predictedPrice, trend, confidence }: AssistantProps) => {
   const [message, setMessage] = useState('');
   const [isTyping, setIsTyping] = useState(false);
 

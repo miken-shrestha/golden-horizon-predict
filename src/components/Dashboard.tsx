@@ -5,40 +5,40 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { TrendingUp, TrendingDown, Sparkles, Brain, ThumbsUp, ThumbsDown, Star, LogOut, Shield } from 'lucide-react';
-import { PriceChart } from './PriceChart';
-import { PredictionCard } from './PredictionCard';
-import { DataInputModule } from './DataInputModule';
-import { AIAssistant } from './AIAssistant';
+import { Chart } from './Chart';
+import { Prediction } from './Prediction';
+import { DataInput } from './DataInput';
+import { Assistant } from './Assistant';
 import { Footer } from './Footer';
-import { AdminDashboard } from './AdminDashboard';
-import { useAuth } from '@/contexts/AuthContext';
-import { activityService } from '@/services/activityService';
+import { Admin } from './Admin';
+import { useAuth } from '@/contexts/Auth';
+import { activityService } from '@/services/activity';
 import { useToast } from '@/hooks/use-toast';
 
-export const GoldPriceDashboard = () => {
+export const Dashboard = () => {
   const { user, logout } = useAuth();
   const { toast } = useToast();
-  const [currentPrice, setCurrentPrice] = useState(134500);
-  const [predictedPrice, setPredictedPrice] = useState(135800);
+  const [price, setPrice] = useState(134500);
+  const [prediction, setPrediction] = useState(135800);
   const [trend, setTrend] = useState<'up' | 'down'>('up');
   const [confidence, setConfidence] = useState<'high' | 'medium' | 'low'>('high');
-  const [viewMode, setViewMode] = useState<'beginner' | 'analyst'>('beginner');
+  const [mode, setMode] = useState<'beginner' | 'analyst'>('beginner');
   const [feedback, setFeedback] = useState<'positive' | 'negative' | null>(null);
-  const [lastUpdate, setLastUpdate] = useState(new Date());
+  const [updated, setUpdated] = useState(new Date());
 
-  const priceChange = predictedPrice - currentPrice;
-  const changePercent = ((priceChange / currentPrice) * 100).toFixed(2);
+  const change = prediction - price;
+  const percent = ((change / price) * 100).toFixed(2);
 
-  const confidenceEmoji = {
+  const emoji = {
     high: '😊',
     medium: '😐',
     low: '😟'
   };
 
-  const trendIcon = trend === 'up' ? TrendingUp : TrendingDown;
-  const trendColor = trend === 'up' ? 'text-green-600' : 'text-red-600';
+  const icon = trend === 'up' ? TrendingUp : TrendingDown;
+  const color = trend === 'up' ? 'text-green-600' : 'text-red-600';
 
-  const formatNPR = (amount: number) => {
+  const format = (amount: number) => {
     return new Intl.NumberFormat('ne-NP', {
       style: 'currency',
       currency: 'NPR',
@@ -62,12 +62,12 @@ export const GoldPriceDashboard = () => {
 
   useEffect(() => {
     const interval = setInterval(() => {
-      const oldPrice = currentPrice;
-      const oldPredicted = predictedPrice;
+      const oldPrice = price;
+      const oldPrediction = prediction;
       
-      setCurrentPrice(prev => prev + (Math.random() - 0.5) * 500);
-      setPredictedPrice(prev => prev + (Math.random() - 0.5) * 800);
-      setLastUpdate(new Date());
+      setPrice(prev => prev + (Math.random() - 0.5) * 500);
+      setPrediction(prev => prev + (Math.random() - 0.5) * 800);
+      setUpdated(new Date());
 
       if (user) {
         activityService.logActivity(
@@ -78,7 +78,7 @@ export const GoldPriceDashboard = () => {
           'Viewed updated gold price prediction',
           {
             currentPrice: oldPrice,
-            predictedPrice: oldPredicted,
+            predictedPrice: oldPrediction,
             trend
           }
         );
@@ -86,7 +86,7 @@ export const GoldPriceDashboard = () => {
     }, 30000);
 
     return () => clearInterval(interval);
-  }, [user, currentPrice, predictedPrice, trend]);
+  }, [user, price, prediction, trend]);
 
   const handleFeedback = (type: 'positive' | 'negative') => {
     setFeedback(type);
@@ -142,7 +142,7 @@ export const GoldPriceDashboard = () => {
             Logout
           </Button>
         </div>
-        <AdminDashboard />
+        <Admin />
       </div>
     );
   }
@@ -176,7 +176,7 @@ export const GoldPriceDashboard = () => {
           <p className="text-gray-600 text-lg">AI-Powered Gold Price Predictions for Nepal Market</p>
           
           <div className="flex justify-center">
-            <Tabs value={viewMode} onValueChange={(value) => setViewMode(value as 'beginner' | 'analyst')}>
+            <Tabs value={mode} onValueChange={(value) => setMode(value as 'beginner' | 'analyst')}>
               <TabsList className="bg-yellow-100 border-yellow-200">
                 <TabsTrigger value="beginner" className="data-[state=active]:bg-yellow-500 data-[state=active]:text-white">
                   👶 Beginner View
@@ -189,9 +189,9 @@ export const GoldPriceDashboard = () => {
           </div>
         </div>
 
-        <AIAssistant 
-          currentPrice={currentPrice}
-          predictedPrice={predictedPrice}
+        <Assistant 
+          currentPrice={price}
+          predictedPrice={prediction}
           trend={trend}
           confidence={confidence}
         />
@@ -207,25 +207,25 @@ export const GoldPriceDashboard = () => {
             </CardHeader>
             <CardContent>
               <div className="space-y-2">
-                <div className="text-3xl font-bold">{formatNPR(currentPrice)}</div>
+                <div className="text-3xl font-bold">{format(price)}</div>
                 <div className="text-sm opacity-90">per tola (11.66 grams)</div>
                 <div className="text-xs opacity-75">
-                  Last updated: {lastUpdate.toLocaleTimeString()}
+                  Last updated: {updated.toLocaleTimeString()}
                 </div>
               </div>
             </CardContent>
           </Card>
 
-          <PredictionCard 
-            predictedPrice={predictedPrice}
-            priceChange={priceChange}
-            changePercent={changePercent}
+          <Prediction 
+            predictedPrice={prediction}
+            priceChange={change}
+            changePercent={percent}
             trend={trend}
             confidence={confidence}
-            confidenceEmoji={confidenceEmoji[confidence]}
-            trendIcon={trendIcon}
-            trendColor={trendColor}
-            formatCurrency={formatNPR}
+            confidenceEmoji={emoji[confidence]}
+            trendIcon={icon}
+            trendColor={color}
+            formatCurrency={format}
           />
 
           <Card className="shadow-lg border-yellow-200">
@@ -256,14 +256,14 @@ export const GoldPriceDashboard = () => {
           </Card>
         </div>
 
-        {viewMode === 'beginner' ? (
+        {mode === 'beginner' ? (
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             <Card className="shadow-lg">
               <CardHeader>
                 <CardTitle>📈 Price Trend (7 Days)</CardTitle>
               </CardHeader>
               <CardContent>
-                <PriceChart simple={true} />
+                <Chart simple={true} />
               </CardContent>
             </Card>
             
@@ -306,11 +306,11 @@ export const GoldPriceDashboard = () => {
                 <CardTitle>📊 Advanced Price Analysis (Nepal)</CardTitle>
               </CardHeader>
               <CardContent>
-                <PriceChart simple={false} />
+                <Chart simple={false} />
               </CardContent>
             </Card>
             
-            <DataInputModule />
+            <DataInput />
           </div>
         )}
       </div>

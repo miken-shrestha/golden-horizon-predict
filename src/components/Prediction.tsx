@@ -4,7 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { LucideIcon } from 'lucide-react';
 
-interface PredictionCardProps {
+interface PredictionProps {
   predictedPrice: number;
   priceChange: number;
   changePercent: string;
@@ -16,7 +16,7 @@ interface PredictionCardProps {
   formatCurrency?: (amount: number) => string;
 }
 
-export const PredictionCard = ({
+export const Prediction = ({
   predictedPrice,
   priceChange,
   changePercent,
@@ -26,7 +26,7 @@ export const PredictionCard = ({
   trendIcon: TrendIcon,
   trendColor,
   formatCurrency = (amount) => `$${amount.toFixed(2)}`
-}: PredictionCardProps) => {
+}: PredictionProps) => {
   return (
     <Card className="shadow-lg border-2 border-amber-200 bg-gradient-to-br from-amber-50 to-yellow-50">
       <CardHeader className="pb-2">

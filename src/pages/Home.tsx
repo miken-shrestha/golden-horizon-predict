@@ -1,10 +1,10 @@
 
 import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { GoldPriceDashboard } from '@/components/GoldPriceDashboard';
-import { useAuth } from '@/contexts/AuthContext';
+import { Dashboard } from '@/components/Dashboard';
+import { useAuth } from '@/contexts/Auth';
 
-const Index = () => {
+const Home = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
 
@@ -18,7 +18,7 @@ const Index = () => {
     return null; // or a loading spinner
   }
 
-  return <GoldPriceDashboard />;
+  return <Dashboard />;
 };
 
-export default Index;
+export default Home;
