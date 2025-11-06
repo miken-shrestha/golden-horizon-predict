@@ -14,6 +14,7 @@ import { Admin } from './Admin';
 import { useAuth } from '@/contexts/Auth';
 import { activityService } from '@/services/activity';
 import { useToast } from '@/hooks/use-toast';
+import { supabase } from '@/integrations/supabase/client';
 
 export const Dashboard = () => {
   const { user, logout } = useAuth();
@@ -25,6 +26,7 @@ export const Dashboard = () => {
   const [mode, setMode] = useState<'beginner' | 'analyst'>('beginner');
   const [feedback, setFeedback] = useState<'positive' | 'negative' | null>(null);
   const [updated, setUpdated] = useState(new Date());
+  const [isLoadingPrediction, setIsLoadingPrediction] = useState(false);
 
   const change = prediction - price;
   const percent = ((change / price) * 100).toFixed(2);
@@ -60,14 +62,58 @@ export const Dashboard = () => {
     }
   }, [user]);
 
+  const getPrediction = async (currentPrice: number) => {
+    setIsLoadingPrediction(true);
+    try {
+      const { data, error } = await supabase.functions.invoke('predict-gold-price', {
+        body: { 
+          currentPrice,
+          historicalData: 'Recent upward trend with slight fluctuations'
+        }
+      });
+
+      if (error) throw error;
+
+      if (data) {
+        console.log('Prediction received:', data);
+        setPrediction(data.predictedPrice);
+        setTrend(data.trend);
+        setConfidence(data.confidence);
+        
+        toast({
+          title: "AI Prediction Updated",
+          description: data.reasoning || "New prediction generated successfully",
+        });
+      }
+    } catch (error) {
+      console.error('Error getting prediction:', error);
+      toast({
+        title: "Prediction Error",
+        description: "Failed to get AI prediction. Using fallback.",
+        variant: "destructive"
+      });
+      // Fallback to random prediction
+      setPrediction(prev => prev + (Math.random() - 0.5) * 800);
+    } finally {
+      setIsLoadingPrediction(false);
+    }
+  };
+
   useEffect(() => {
+    // Get initial prediction
+    getPrediction(price);
+
     const interval = setInterval(() => {
       const oldPrice = price;
       const oldPrediction = prediction;
       
-      setPrice(prev => prev + (Math.random() - 0.5) * 500);
-      setPrediction(prev => prev + (Math.random() - 0.5) * 800);
+      // Update price with small random change
+      const newPrice = price + (Math.random() - 0.5) * 500;
+      setPrice(newPrice);
       setUpdated(new Date());
+
+      // Get new AI prediction
+      getPrediction(newPrice);
 
       if (user) {
         activityService.logActivity(
@@ -83,10 +129,10 @@ export const Dashboard = () => {
           }
         );
       }
-    }, 30000);
+    }, 60000); // Update every minute
 
     return () => clearInterval(interval);
-  }, [user, price, prediction, trend]);
+  }, [user]);
 
   const handleFeedback = (type: 'positive' | 'negative') => {
     setFeedback(type);
@@ -216,17 +262,27 @@ export const Dashboard = () => {
             </CardContent>
           </Card>
 
-          <Prediction 
-            predictedPrice={prediction}
-            priceChange={change}
-            changePercent={percent}
-            trend={trend}
-            confidence={confidence}
-            confidenceEmoji={emoji[confidence]}
-            trendIcon={icon}
-            trendColor={color}
-            formatCurrency={format}
-          />
+          <div className="relative">
+            {isLoadingPrediction && (
+              <div className="absolute inset-0 bg-white/50 backdrop-blur-sm rounded-lg flex items-center justify-center z-10">
+                <div className="flex items-center gap-2">
+                  <Brain className="h-5 w-5 animate-spin text-purple-600" />
+                  <span className="text-sm font-medium">AI Analyzing...</span>
+                </div>
+              </div>
+            )}
+            <Prediction 
+              predictedPrice={prediction}
+              priceChange={change}
+              changePercent={percent}
+              trend={trend}
+              confidence={confidence}
+              confidenceEmoji={emoji[confidence]}
+              trendIcon={icon}
+              trendColor={color}
+              formatCurrency={format}
+            />
+          </div>
 
           <Card className="shadow-lg border-yellow-200">
             <CardHeader className="pb-2">

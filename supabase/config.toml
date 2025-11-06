@@ -1,1 +1,4 @@
 project_id = "bounerbgculwpyerwaun"
+
+[functions.predict-gold-price]
+verify_jwt = false
